@@ -66,8 +66,18 @@ Plug 'tpope/vim-fugitive'
 Plug 'kien/ctrlp.vim'
 Plug 'fatih/vim-go', { 'do': ':GoUpdateBinaries' }
 
+Plug 'windwp/nvim-autopairs'
+
+
+" prettier
+Plug 'sbdchd/neoformat'
+
 call plug#end()
 
+
+" prettier 
+let g:neoformat_try_node_exe = 1
+autocmd BufWritePre *.js,*.ts Neoformat
 
 " Set completeopt to have a better completion experience
 " :help completeopt
@@ -178,4 +188,13 @@ nvim_lsp.gopls.setup{
 		    },
 	    },
 	on_attach = on_attach,
-}
+  }
+
+-- sudo npm install -g typescript typescript-language-server 
+require'lspconfig'.tsserver.setup {}
+
+-- autoclose brackets
+require("nvim-autopairs").setup {}
+
+
+
