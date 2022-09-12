@@ -26,7 +26,7 @@ let g:go_highlight_extra_types = 1
 let g:go_highlight_operators = 1
 let g:go_highlight_function_parameters = 1
 let g:go_fmt_autosave = 1
-let g:go_highlight_types = 1 
+let g:go_highlight_types = 1
 let g:go_fmt_command = "goimports"
 
 call plug#begin()
@@ -73,10 +73,19 @@ Plug 'windwp/nvim-autopairs'
 " prettier
 Plug 'sbdchd/neoformat'
 
+" zig
+Plug 'ziglang/zig.vim'
+Plug 'williamboman/nvim-lsp-installer'
+Plug 'nvim-lua/completion-nvim'
+
+" markdown
+Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
+
+
 call plug#end()
 
 
-" prettier 
+" prettier
 let g:neoformat_try_node_exe = 1
 autocmd BufWritePre *.js,*.ts Neoformat
 
@@ -191,11 +200,10 @@ nvim_lsp.gopls.setup{
 	on_attach = on_attach,
   }
 
--- sudo npm install -g typescript typescript-language-server 
+-- sudo npm install -g typescript typescript-language-server
 require'lspconfig'.tsserver.setup {}
 
 -- autoclose brackets
 require("nvim-autopairs").setup {}
-
-
-
+require("nvim-lsp-installer").setup {}
+require'lspconfig'.zls.setup{}
