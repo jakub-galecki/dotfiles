@@ -11,13 +11,24 @@ set number relativenumber
 set hlsearch
 set ruler
 highlight Comment ctermfg=green
-colorscheme peachpuff
+
+
+let g:opamshare = substitute(system('opam var share'),'\n$','','''')
+execute "set rtp+=" . g:opamshare . "/merlin/vim"
 
 nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
 nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
 nnoremap <leader>fh <cmd>lua require('telescope.builtin').help_tags()<cr>
 nnoremap <leader>fd <cmd>lua require('telescope.builtin').lsp_definitions()<cr>
+
+nnoremap <F5> :call LanguageClient_contextMenu()<CR>
+" Or map each action separately
+nnoremap <silent> K :call LanguageClient#textDocument_hover()<CR>
+nnoremap <silent> gd :call LanguageClient#textDocument_definition()<CR>
+nnoremap <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+
+
 
 let g:go_highlight_fields = 1
 let g:go_highlight_functions = 1
@@ -32,6 +43,10 @@ let g:go_fmt_command = "goimports"
 call plug#begin()
 " Collection of common configurations for the Nvim LSP client
 Plug 'neovim/nvim-lspconfig'
+Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
+Plug 'shaunsingh/nord.nvim'
+Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
+Plug 'shaunsingh/oxocarbon.nvim', { 'do': './install.sh' }
 
 " Completion framework
 Plug 'hrsh7th/nvim-cmp'
@@ -81,9 +96,26 @@ Plug 'nvim-lua/completion-nvim'
 " markdown
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app && yarn install' }
 
+Plug 'autozimu/LanguageClient-neovim', {'branch': 'next', 'do': 'bash install.sh'}
+Plug 'ajh17/VimCompletesMe'
+
 
 call plug#end()
 
+" colorscheme tokyonight
+
+" let g:catppuccin_flavour = "frappe"
+" lua require("catppuccin").setup()
+" colorscheme catppuccin
+
+
+colorscheme oxocarbon
+
+set hidden
+
+ let g:LanguageClient_serverCommands = {
+ \   'ocaml':           ['ocamllsp'],
+ \}
 
 " prettier
 let g:neoformat_try_node_exe = 1
@@ -207,3 +239,4 @@ require'lspconfig'.tsserver.setup {}
 require("nvim-autopairs").setup {}
 require("nvim-lsp-installer").setup {}
 require'lspconfig'.zls.setup{}
+require'lspconfig'.ocamllsp.setup{}
