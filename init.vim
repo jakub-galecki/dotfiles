@@ -15,7 +15,6 @@ highlight Comment ctermfg=green
 
 let g:opamshare = substitute(system('opam var share'),'\n$','','''')
 execute "set rtp+=" . g:opamshare . "/merlin/vim"
-
 nnoremap <leader>ff <cmd>lua require('telescope.builtin').find_files()<cr>
 nnoremap <leader>fg <cmd>lua require('telescope.builtin').live_grep()<cr>
 nnoremap <leader>fb <cmd>lua require('telescope.builtin').buffers()<cr>
@@ -47,6 +46,7 @@ Plug 'folke/tokyonight.nvim', { 'branch': 'main' }
 Plug 'shaunsingh/nord.nvim'
 Plug 'catppuccin/nvim', { 'as': 'catppuccin' }
 Plug 'shaunsingh/oxocarbon.nvim', { 'do': './install.sh' }
+Plug 'bluz71/vim-moonfly-colors'
 
 " Completion framework
 Plug 'hrsh7th/nvim-cmp'
@@ -104,12 +104,11 @@ call plug#end()
 
 " colorscheme tokyonight
 
-" let g:catppuccin_flavour = "frappe"
+" let g:catppuccin_flavour = "mocha"
 " lua require("catppuccin").setup()
-" colorscheme catppuccin
+colorscheme catppuccin
+colorscheme moonfly
 
-
-colorscheme oxocarbon
 
 set hidden
 
@@ -240,3 +239,4 @@ require("nvim-autopairs").setup {}
 require("nvim-lsp-installer").setup {}
 require'lspconfig'.zls.setup{}
 require'lspconfig'.ocamllsp.setup{}
+require'lspconfig'.psalm.setup{}
