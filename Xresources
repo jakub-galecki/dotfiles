@@ -1,0 +1,47 @@
+xterm*faceName: xft: Hack 
+xterm*faceSize: 11
+xterm*saveLines: 2000
+xterm*foreground: white
+xterm*background: black
+xterm*cursorColor: rgb:80/00/00
+
+xterm*vt100.translations: #override \
+    Shift Ctrl <Key> C: copy-selection(CLIPBOARD) \n\
+    Shift Ctrl <Key> V: insert-selection(CLIPBOARD)
+
+
+! black
+xterm*color0: #45475A
+xterm*color8: #585B70
+
+! red
+xterm*color1: #F38BA8
+xterm*color9: #F38BA8
+
+! green
+xterm*color2: #A6E3A1
+xterm*color10: #A6E3A1
+
+! yellow
+xterm*color3: #F9E2AF
+xterm*color11: #F9E2AF
+
+! blue
+xterm*color4: #89B4FA
+xterm*color12: #89B4FA
+
+! magenta
+xterm*color5: #F5C2E7
+xterm*color13: #F5C2E7
+
+! cyan
+xterm*color6: #94E2D5
+*color14: #94E2D5
+
+! white
+xterm*color7: #BAC2DE
+xterm*color15: #A6ADC8
+
+
+xterm*loginShell: true
+xterm*termName: xterm-256color
