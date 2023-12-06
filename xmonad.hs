@@ -15,16 +15,14 @@ import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
 import XMonad.Util.SpawnOnce
 import XMonad.Util.Run
-import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageDocks
-import XMonad.Hooks.EwmhDesktops
-import XMonad.Hooks.SetWMName
-
+import XMonad.Hooks.DynamicLog
+import Graphics.X11.ExtraTypes.XF86
 
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
 --
-myTerminal      = "st"
+myTerminal      = "xterm"
 
 -- Whether focus follows the mouse pointer.
 myFocusFollowsMouse :: Bool
@@ -36,7 +34,7 @@ myClickJustFocuses = False
 
 -- Width of the window border in pixels.
 --
-myBorderWidth   = 2
+myBorderWidth   = 2 
 
 -- modMask lets you specify which modkey you want to use. The default
 -- is mod1Mask ("left alt").  You may also consider using mod3Mask
@@ -70,13 +68,15 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     [ ((modm .|. shiftMask, xK_Return), spawn $ XMonad.terminal conf)
 
     -- launch dmenu
-    , ((modm,               xK_p     ), spawn "dmenu_run")
+    , ((modm,               xK_p     ), spawn "`dmenu_path | /home/batman/.cabal/bin/yeganesh -- -b -fn xft:Hack:size=14` && eval \"exec $exe\"")
 
-    -- launch rofi
+    -- launch gmrun
     , ((modm .|. shiftMask, xK_p     ), spawn "rofi -show drun")
 
     -- close focused window
     , ((modm .|. shiftMask, xK_c     ), kill)
+
+    , ((modm .|. shiftMask, xK_l     ), spawn "slock")
 
      -- Rotate through the available layout algorithms
     , ((modm,               xK_space ), sendMessage NextLayout)
@@ -139,7 +139,18 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
     , ((modm .|. shiftMask, xK_slash ), spawn ("echo \"" ++ help ++ "\" | xmessage -file -"))
     ]
     ++
+    [ ((0 , xF86XK_AudioRaiseVolume), spawn "pactl set-sink-volume 0 +1.5%")
+    , ((0 , xF86XK_AudioLowerVolume), spawn "pactl set-sink-volume 0 -1.5%")
+    , ((0 , xF86XK_AudioMute), spawn "pactl set-sink-mute 0 toggle")
 
+    , ((0, xF86XK_AudioPlay), spawn "playerctl play-pause")
+    , ((0, xF86XK_AudioPrev), spawn "playerctl previous")
+    , ((0, xF86XK_AudioNext), spawn "playerctl next")
+
+    , ((0, xF86XK_MonBrightnessUp), spawn "lux -a 5%")
+    , ((0, xF86XK_MonBrightnessDown), spawn "lux -s 5%")
+    ]
+    ++
     --
     -- mod-[1..9], Switch to workspace N
     -- mod-shift-[1..9], Move client to workspace N
@@ -188,7 +199,7 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = avoidStruts (tiled ||| Mirror tiled ||| Full)
+myLayout = avoidStruts(tiled ||| Mirror tiled ||| Full)
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -232,7 +243,7 @@ myManageHook = composeAll
 -- return (All True) if the default handler is to be run afterwards. To
 -- combine event hooks use mappend or mconcat from Data.Monoid.
 --
-myEventHook = fullscreenEventHook
+myEventHook = mempty
 
 ------------------------------------------------------------------------
 -- Status bars and logging
@@ -240,7 +251,9 @@ myEventHook = fullscreenEventHook
 -- Perform an arbitrary action on each internal state change or X event.
 -- See the 'XMonad.Hooks.DynamicLog' extension for examples.
 --
-myLogHook = return ()
+myLogHook h0 h1 = dynamicLogWithPP $ def
+  {  ppOutput = \x -> hPutStrLn h0 x >> hPutStrLn h1 x
+  }
 
 ------------------------------------------------------------------------
 -- Startup hook
@@ -250,35 +263,19 @@ myLogHook = return ()
 -- per-workspace layout choices.
 --
 -- By default, do nothing.
-myStartupHook = do
-  spawnOnce "xrandr --output DVI-D-0 --mode 1920x1080 --rate 60"
-  spawnOnce "xrdb ~/st/Xdefaults"
-  setWMName "LG3D"
+myStartupHook = do 
+    spawnOnce "nitrogen --restore &" 
+    spawnOnce "xrandr --output DP1 --primary --mode 1920x1080 --right-of eDP1"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
 
 -- Run xmonad with the settings you specify. No need to modify this.
 --
-main = do 
-  xmproc0 <- spawnPipe "xmobar -x 0"
-  xmproc1 <- spawnPipe "xmobar -x 1"
-  xmonad $ docks defaults
-        { manageHook = manageDocks <+> manageHook defaults
-        , logHook = dynamicLogWithPP xmobarPP
-                        { 
-                          ppOutput = \x -> hPutStrLn xmproc0 x  >> hPutStrLn xmproc1 x
-                        }
-        
-        }
-
--- A structure containing your configuration settings, overriding
--- fields in the default config. Any you don't override, will
--- use the defaults defined in xmonad/XMonad/Config.hs
---
--- No need to modify this.
---
-defaults = def {
+main = do
+    xmproc0 <- spawnPipe "xmobar -x 0  ~/.xmobarrc"
+    xmproc1 <- spawnPipe "xmobar -x 1  ~/.xmobarrc"
+    xmonad $ docks $ def {
       -- simple stuff
         terminal           = myTerminal,
         focusFollowsMouse  = myFocusFollowsMouse,
@@ -297,10 +294,18 @@ defaults = def {
         layoutHook         = myLayout,
         manageHook         = myManageHook,
         handleEventHook    = myEventHook,
-        logHook            = myLogHook,
+        logHook            = myLogHook xmproc0 xmproc1,
         startupHook        = myStartupHook
     }
 
+
+-- A structure containing your configuration settings, overriding
+-- fields in the default config. Any you don't override, will
+-- use the defaults defined in xmonad/XMonad/Config.hs
+--
+-- No need to modify this.
+--
+-- defaults = 
 -- | Finally, a copy of the default bindings in simple textual tabular format.
 help :: String
 help = unlines ["The default modifier key is 'alt'. Default keybindings:",
